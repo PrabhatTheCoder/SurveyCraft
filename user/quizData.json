@@ -1,0 +1,79 @@
+[
+    {
+      "id": 1,
+      "question": "What is Phishing?",
+      "options": [
+        "A type of social engineering attack where an attacker sends fraudulent messages to trick the victim into revealing sensitive information.",
+        "A method of catching fish using bait.",
+        "A technique used in cybersecurity to protect sensitive information.",
+        "A type of computer virus that spreads through email attachments."
+      ],
+      "correctAnswerIndex": 0
+    },
+    {
+      "id": 2,
+      "question": "Which language is used for web apps?",
+      "options": [
+        "PHP",
+        "Python",
+        "JavaScript",
+        "All of the above"
+      ],
+      "correctAnswerIndex": 3
+    },
+    {
+      "id": 2,
+      "question": "Which language is used for web apps?",
+      "options": [
+        "PHP",
+        "Python",
+        "JavaScript",
+        "All of the above"
+      ],
+      "correctAnswerIndex": 3
+    },
+    {
+      "id": 2,
+      "question": "Which language is used for web apps?",
+      "options": [
+        "PHP",
+        "Python",
+        "JavaScript",
+        "All of the above"
+      ],
+      "correctAnswerIndex": 3
+    },
+    {
+      "id": 2,
+      "question": "Which language is used for web apps?",
+      "options": [
+        "PHP",
+        "Python",
+        "JavaScript",
+        "All of the above"
+      ],
+      "correctAnswerIndex": 3
+    },
+    {
+      "id": 2,
+      "question": "Which language is used for web apps?",
+      "options": [
+        "PHP",
+        "Python",
+        "JavaScript",
+        "All of the above"
+      ],
+      "correctAnswerIndex": 3
+    },
+    {
+      "question": "What are the primary colors?",
+      "options": ["Red", "Green", "Blue", "Yellow"],
+      "correctAnswerIndex": [0, 2]
+    },
+    {
+      "question": "Which of the following are programming languages?",
+      "options": ["Python", "HTML", "JavaScript", "CSS"],
+      "correctAnswerIndex": [0, 2]
+    }
+  ]
+  
