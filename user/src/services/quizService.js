@@ -1,10 +1,12 @@
 export const fetchQuiz = async (quizId) => {
-    if (!quizId) {
-        throw new Error('Quiz ID is required');
+    try {
+        const response = await fetch(`http://127.0.0.1:8000/api/quiz/${quizId}/`);
+        if (!response.ok) {
+            throw new Error('Failed to fetch quiz');
+        }
+        return await response.json();
+    } catch (error) {
+        console.error(error);
+        throw error;
     }
-    const response = await fetch(`/quizzes/api/quizzes/${quizId}/`);
-    if (!response.ok) {
-        throw new Error('Network response was not ok');
-    }
-    return response.json();
 };

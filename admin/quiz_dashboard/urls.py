@@ -5,5 +5,5 @@ from django.shortcuts import redirect
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('quizzes/', include('quizzes.urls')),
-    path('dashboard/', lambda request: redirect('quizzes:dashboard')), 
+    path('', lambda request: redirect('quizzes:dashboard')),  # Redirect root URL to dashboard
 ]

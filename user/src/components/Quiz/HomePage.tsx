@@ -11,7 +11,7 @@ const QuizDetail = ({ quizId }) => {
 
         const getQuiz = async () => {
             if (!quizId) {
-                setError('BRUHHHH!!!');
+                setError('No Quiz ID provided!');
                 setLoading(false);
                 return;
             }

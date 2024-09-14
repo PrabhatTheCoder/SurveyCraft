@@ -122,9 +122,11 @@
             <h1>Create Quiz</h1>
             <p>Specify the type of questions and then add questions accordingly.</p>
         </div>
+
+        <!-- Form for creating the quiz -->
         <form id="quiz-form" method="post">
             {% csrf_token %}
-            {{ quiz_form.as_p }}  <!-- This will render the form fields including the description field -->
+            {{ quiz_form.as_p }}  <!-- Render form fields for quiz title and description -->
 
             <div class="type-selection">
                 <label for="type-select">Select Question Type:</label>
@@ -135,10 +137,9 @@
             </div>
 
             <div id="questions-container">
-                <!-- New questions will be added here -->
+                <!-- Questions will be dynamically added here -->
             </div>
 
-            <!-- Move the "Create Quiz" button to the end -->
             <button type="submit" id="create-quiz-btn" style="display:none;">Create Quiz</button>
         </form>
     </div>
@@ -161,7 +162,6 @@
                 let typeSelect = document.getElementById('type-select');
                 let choiceType = typeSelect.value;
 
-                // Create new question container
                 let newQuestion = document.createElement('div');
                 newQuestion.classList.add('question-container');
                 newQuestion.innerHTML = `
@@ -182,48 +182,50 @@
                     </div>
                 `;
 
-                // Add the new question to the container
                 questionsContainer.appendChild(newQuestion);
 
-                // Add event listener to the "Add option" button in the new question
                 newQuestion.querySelector('.add-choice-btn').addEventListener('click', function () {
                     addNewChoice(newQuestion, choiceType);
                 });
 
-                // Add event listener to the "Add Question" button in the new question
                 newQuestion.querySelector('.add-question-btn').addEventListener('click', function () {
                     addNewQuestion();
                 });
 
-                // Add event listener to the "Remove Question" button
                 newQuestion.querySelector('.remove-question-btn').addEventListener('click', function () {
                     questionsContainer.removeChild(newQuestion);
                 });
 
-                // Move "Create Quiz" button to the end of the page when the first question is created
                 document.getElementById('create-quiz-btn').style.display = 'inline-block';
             }
 
-            // Initial setup: Add the first question
             addNewQuestion();
 
-            // Listen for changes in question type selection
             document.getElementById('type-select').addEventListener('change', function () {
-                // When type changes, add a new question with the selected type
                 addNewQuestion();
             });
 
-            // Show an alert and redirect when the form is submitted
             document.getElementById('quiz-form').addEventListener('submit', function (event) {
-                // Get the quiz title
-                let quizTitleElement = document.querySelector('input[name="title"]');
-                let quizTitle = quizTitleElement ? quizTitleElement.value : 'Untitled Quiz';
+                event.preventDefault();
+ 
+                const formData = new FormData(this);
 
-                // Show the alert
-                alert('Quiz created');
-
-                // Redirect to Dashboard.html with the quiz title as a query parameter
-                window.location.href = `/quizzes/dashboard/?title=${encodeURIComponent(quizTitle)}`;
+                fetch("{% url 'quizzes:create-quiz' %}", {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    },
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message) {
+                        alert(data.message);
+                        window.location.href = `/quizzes/dashboard/?quiz_id=${data.quiz_id}`;
+                    } else if (data.error) {
+                        alert(data.error);
+                    }
+                });
             });
         });
     </script>

@@ -13,12 +13,12 @@
         <ul>
             {% for quiz in quizzes %}
                 <li>{{ quiz.title }} - Created on {{ quiz.created_at }}</li>
-                <a href="{% url 'edit_quiz' quiz.id %}">Edit</a>
+                <a href="{% url 'quizzes:edit_quiz' quiz.id %}">Edit</a>
             {% empty %}
                 <li>No quizzes found.</li>
             {% endfor %}
         </ul>
-        <a href="{% url 'create-quiz' %}">+ Create New Quiz</a>
+        <a href="{% url 'quizzes:create-quiz' %}">+ Create New Quiz</a>
     </div>
 </body>
 </html>
