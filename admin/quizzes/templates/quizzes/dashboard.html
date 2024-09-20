@@ -14,6 +14,7 @@
             {% for quiz in quizzes %}
                 <li>{{ quiz.title }} - Created on {{ quiz.created_at }}</li>
                 <a href="{% url 'quizzes:edit_quiz' quiz.id %}">Edit</a>
+                <a href="{% url 'quizzes:delete_quiz' quiz.id %}">delete</a>
             {% empty %}
                 <li>No quizzes found.</li>
             {% endfor %}
