@@ -1,6 +1,7 @@
 from django.db import models
 import uuid
 
+
 class Quiz(models.Model):
     
     QUESTION_TYPES = (
@@ -14,10 +15,14 @@ class Quiz(models.Model):
     question_text = models.CharField(max_length=500, default="Default question text")
     question_type = models.CharField(max_length=50, choices=QUESTION_TYPES)
     created_at = models.DateTimeField(auto_now_add=True)  
-    updated_at = models.DateTimeField(auto_now=True) 
+    updated_at = models.DateTimeField(auto_now=True)
+    score = models.IntegerField(default=5)
 
     def __str__(self):
         return f"{self.title}: {self.question_text}"
+    
+    def total_question(self):
+        return Quiz.objects.all().count()
     
 class Multiple(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

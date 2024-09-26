@@ -1,11 +1,10 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import *
-from .forms import *
 from django.http import JsonResponse
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
-from .serializers import QuizSerializer
+from .serializers import QuizSerializer, ListQuizSerializer
 
 
 class NewQuiz(APIView):
@@ -38,4 +37,19 @@ class UpdateQuiz(APIView):
                 return Response({"error": str(e)},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+class ListQuizView(APIView):
+    def get(self, request, *args, **kwargs):
+        queryset = Quiz.objects.all()
+        serializer = ListQuizSerializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+# class ContestantEvaluation(APIView):
+#     def post(self, request, *args, **kwargs):
+#         quiz_id = request.data['quiz_id']
+#         choice_id = request.data['choice_id']
+#         instance = Multiple.objects.get(id=choice_id,quiz=quiz_id)
+#         if instance.is_correct:
+            
         

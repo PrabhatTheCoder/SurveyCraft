@@ -11,7 +11,7 @@ class QuizSerializer(serializers.ModelSerializer):
     choices = MultipleSerializer(many=True)
     class Meta:
         model = Quiz
-        fields = ['id', 'title', 'description', 'question_text', 'question_type','choices']
+        fields = ['id', 'score','title', 'description', 'question_text', 'question_type','choices']
         
     def create(self, validated_data):
         choices_data = validated_data.pop('choices')
@@ -35,3 +35,10 @@ class QuizSerializer(serializers.ModelSerializer):
                 Multiple.objects.create(quiz=instance, **choice_data)  # Adjust as needed
         
         return instance
+
+
+class ListQuizSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Quiz
+        fields = ['id','title','description']
