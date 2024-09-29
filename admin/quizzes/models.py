@@ -44,8 +44,8 @@ class Project(models.Model):
 
 class Questions(models.Model):
     QUESTION_TYPES = (
-        ('RAD', 'Single Choice'),
-        ('CKB', 'Multiple Choice'),
+        ('SC', 'Single Choice'),
+        ('MC', 'Multiple Choice'),
         ('NOPE', 'Numeric Open Ended'),
         ('OPE', 'Open Ended'),
     )
