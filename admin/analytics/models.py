@@ -1,9 +1,10 @@
 from django.db import models
-    
-    
+import uuid
+
 class QuizAnalytics(models.Model):
-    user = models.ForeignKey("users.CustomeUser", on_delete=models.CASCADE)
-    quiz_id = models.ForeignKey("quizzes.Quiz")  
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey("users.CustomUser", on_delete=models.CASCADE)  
+    quiz = models.ForeignKey("quizzes.Quiz", on_delete=models.CASCADE)
     total_score = models.IntegerField(default=0)
     correct_answers = models.IntegerField()
     total_questions = models.IntegerField()

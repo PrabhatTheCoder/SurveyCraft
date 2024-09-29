@@ -43,13 +43,4 @@ class ListQuizView(APIView):
         queryset = Quiz.objects.all()
         serializer = ListQuizSerializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-    
-
-# class ContestantEvaluation(APIView):
-#     def post(self, request, *args, **kwargs):
-#         quiz_id = request.data['quiz_id']
-#         choice_id = request.data['choice_id']
-#         instance = Multiple.objects.get(id=choice_id,quiz=quiz_id)
-#         if instance.is_correct:
-            
         

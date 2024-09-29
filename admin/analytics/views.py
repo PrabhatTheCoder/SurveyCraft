@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
-from quizzes.models import Multiple
+from quizzes.models import Multiple, Quiz
 from .models import QuizAnalytics
 from rest_framework.response import Response
 from rest_framework import status
@@ -31,9 +31,9 @@ class ContestantEvaluation(APIView):
         if not multiple_object:
             return Response({"error": "Invalid answers provided"}, status=status.HTTP_400_BAD_REQUEST)
         
+        total_questions = multiple_object.quiz.total_questions()
         quiz = multiple_object.quiz
-        total_questions = quiz.choices.count()
-
+        
         QuizAnalytics.objects.create(
             user=user,
             quiz=quiz,
