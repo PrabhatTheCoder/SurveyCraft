@@ -12,6 +12,6 @@ In addition to academic uses, companies can leverage the platform to conduct sur
 - Detailed reporting for academic and business analysis.
 
 ### Tech Stack:
-Tech Using - Django Rest Framework, Redis, OAUth2.0, JWT, Docker, etc.
+Tech Using - Django Rest Framework, Websocket, Celery, Redis, OAUth2.0, JWT, Docker, etc.
 
 This project showcases my expertise in building scalable backends, designing REST APIs, and implementing solutions that cater to both educational institutions and businesses."
