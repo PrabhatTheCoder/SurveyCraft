@@ -1,45 +1,38 @@
-from django.shortcuts import render
 from rest_framework.views import APIView
-from quizzes.models import Multiple, Quiz
-from .models import QuizAnalytics
 from rest_framework.response import Response
 from rest_framework import status
-from django.utils import timezone
+from quizzes.models import Project
+from .serializers import QuestionSerializer
+from django.shortcuts import get_object_or_404
 
 
-class ContestantEvaluation(APIView):
-    
-    def calculate_score(user_answers):
-        total_score = 0
-        correct_answers = 0
 
-        multiple_objects = Multiple.objects.filter(id__in=user_answers)
-        for obj in multiple_objects:
-            if obj.is_correct == True:
-                score = obj.quiz.score
-                total_score += score
-                correct_answers += 1
-        return total_score, correct_answers
-    
-    
+class SurveyAnalyticsView(APIView):
+
     def post(self, request, *args, **kwargs):
-        user = request.user
-        user_answers = request.data['user_answers']
-        total_score, correct_answers = self.calculate_score(user_answers)
-        
-        multiple_object = Multiple.objects.filter(id=user_answers[0]).first()
-        if not multiple_object:
-            return Response({"error": "Invalid answers provided"}, status=status.HTTP_400_BAD_REQUEST)
-        
-        total_questions = multiple_object.quiz.total_questions()
-        quiz = multiple_object.quiz
-        
-        QuizAnalytics.objects.create(
-            user=user,
-            quiz=quiz,
-            total_score=total_score,
-            correct_answers=correct_answers,
-            total_questions=total_questions,
-            time_taken=timezone.now() - request.data.get('start_time', timezone.now())
-        )
-        return Response({"total_score": total_score,"correct_answers": correct_answers}, status=status.HTTP_200_OK)
+        # project_id = request.GET.get('id')
+        # audience_list = request.GET.getlist('audience')  # Expecting a list of audience IDs
+
+        project_id = request.data['id']
+        audience_list = request.data['audience']
+
+        if not project_id:
+            return Response({"error": "Project ID is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            project = get_object_or_404(Project, id=project_id)  # Only filter by project ID
+
+            if project.projectType == 'SRV':
+                questions = project.questions.prefetch_related('choices').all()
+
+                # No need to pass 'questions', only 'audience_list' is needed
+                question_data = QuestionSerializer(questions, many=True, context={'audience_list': audience_list}).data
+
+                return Response({"questions": question_data}, status=status.HTTP_200_OK)
+            else:
+                return Response({"error": "Invalid project type"}, status=status.HTTP_400_BAD_REQUEST)
+
+        except Project.DoesNotExist:
+            return Response({"error": "Project not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

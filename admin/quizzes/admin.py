@@ -1,29 +1,32 @@
 from django.contrib import admin
-from .models import AllQuiz, Quiz, Multiple
+from .models import Audience, Project, Questions, MultipleChoice, Answer
 
-# Inline class for Multiple choices related to a Quiz
-class MultipleInline(admin.TabularInline):
-    model = Multiple
-    extra = 1  # Number of extra forms in the inline section
+@admin.register(Audience)
+class AudienceAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name', 'createdAt', 'updatedAt')
+    search_fields = ('name', 'description')
+    list_filter = ('createdAt', 'updatedAt')
 
-# Admin class for AllQuiz
-@admin.register(AllQuiz)
-class AllQuizAdmin(admin.ModelAdmin):
-    list_display = ('name', 'created_at', 'updated_at', 'expiry_date')
-    search_fields = ('name',)
-    list_filter = ('expiry_date', 'created_at')
+@admin.register(Project)
+class ProjectAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name', 'status', 'projectType', 'audience', 'createdAt', 'expiry_date')
+    search_fields = ('name', 'audience__name')
+    list_filter = ('status', 'projectType', 'audience', 'createdAt')
 
-# Admin class for Quiz with inlines for Multiple choices
-@admin.register(Quiz)
-class QuizAdmin(admin.ModelAdmin):
-    list_display = ('title', 'eligible_quiz', 'question_type', 'created_at', 'score')
-    search_fields = ('title', 'question_text')
-    list_filter = ('question_type', 'created_at', 'eligible_quiz')
-    inlines = [MultipleInline]  # Adds the Multiple choices inline to the Quiz admin
+@admin.register(Questions)
+class QuestionsAdmin(admin.ModelAdmin):
+    list_display = ('id', 'question_text', 'project', 'question_type', 'created_at', 'score')
+    search_fields = ('question_text', 'project__name')
+    list_filter = ('question_type', 'project', 'created_at')
 
-# Admin class for Multiple
-@admin.register(Multiple)
-class MultipleAdmin(admin.ModelAdmin):
-    list_display = ('quiz', 'choice_text', 'is_correct')
-    search_fields = ('choice_text',)
-    list_filter = ('quiz', 'is_correct')
+@admin.register(MultipleChoice)
+class MultipleChoiceAdmin(admin.ModelAdmin):
+    list_display = ('id', 'question', 'choiceText', 'is_correct', 'count')
+    search_fields = ('choiceText', 'question__question_text')
+    list_filter = ('is_correct', 'question')
+
+@admin.register(Answer)
+class AnswerAdmin(admin.ModelAdmin):
+    list_display = ('id', 'user', 'question', 'selected_choice', 'response')
+    search_fields = ('user__username', 'question__question_text')
+    list_filter = ('question', 'user')
