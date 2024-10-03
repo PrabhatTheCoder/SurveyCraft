@@ -1,0 +1,8 @@
+# Ignore migration files
+*/migrations/*.py
+*/migrations/*.pyc
+
+# Ignore temp directory
+temp/
+questions/
+multiple/
