@@ -35,6 +35,9 @@ class Project(models.Model):
     status = models.CharField(choices=PROJECT_STATUS, max_length=3)
     projectType = models.CharField(choices=PROJECT_TYPE, max_length=3)
     audience = models.ForeignKey(Audience, on_delete=models.CASCADE, related_name='projects')
+    
+    app = models.ForeignKey('company.App',models.CASCADE,'projects')
+    
     orderQuestion = models.BooleanField(default=False)
     createdAt = models.DateTimeField(auto_now=True)
     expiry_date = models.DateTimeField()
