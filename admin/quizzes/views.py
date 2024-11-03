@@ -4,43 +4,130 @@ from django.http import JsonResponse
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
-from .serializers import QuestionSerializer, MultipleChoiceSerializer
+from .serializers import QuestionSerializer, MultipleChoiceSerializer, ProjectSerializer, ListQuestionSerializer, QuizSurveyResponseSerializer
+from rest_framework.permissions import IsAuthenticated
 
+class ProjectView(APIView):
+    
+    def post(self, request, *args, **kwargs):
+        serializer = ProjectSerializer(data=request.data)
+        
+        if serializer.is_valid():
+            project = serializer.save()
+            return Response({'project_id': str(project.id)}, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        
+    def put(self, request, *args, **kwargs):
+        id = request.data["id"]
+        instance = Project.objects.get(id=id)
+        serializer = ProjectSerializer(instance, data=request.data, partial=True)
+        
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'status': 'Updated Sucessfully'}, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+class ListProjectView(APIView):
+    
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        try:
+            apps = user.app.all()  # Ensure the User model has an 'app' field
+            
+            projects = [project for app in apps for project in app.project_app.all()]
+            
+            serializer = ProjectSerializer(projects, many=True)
+            return Response(serializer.data)
+        
+        except AttributeError:
+            return Response({"error": "User does not have any associated apps"}, status=404)
+        
+        
 
-class NewQuiz(APIView):
+        
+class QuestionView(APIView):
     
     def post(self, request, *args, **kwargs):
         serializer = QuestionSerializer(data=request.data)
         
         if serializer.is_valid():
-            try:
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            except Exception as e:
-                return Response({"error": str(e)},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            question = serializer.save()
+            return Response({'question_id': str(question.id)}, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
-
-class UpdateQuiz(APIView):
-    
-    def post(self, request, *args, **kwargs):
-        id = request.data['id']
+        
+    def put(self, request, *args, **kwargs):
+        id = kwargs.get('id')
         instance = Questions.objects.get(id=id)
         serializer = QuestionSerializer(instance=instance,data=request.data, partial=True)
         
         if serializer.is_valid():
-            try:
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            except Exception as e:
-                return Response({"error": str(e)},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
-class ListQuizView(APIView):
+        
+        
+class MultipleChoiceView(APIView):
+    
+    def post(self, request, *args, **kwargs):
+        serializer = MultipleChoiceSerializer(data=request.data)
+        
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'multiple_id': serializer.data['id']}, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+    def put(self, request, *args, **kwargs):
+        id = kwargs.get('id')
+        instance = MultipleChoice.objects.get(id=id)
+        
+        serializer = MultipleChoiceSerializer(instance, data=request.data, partial=True)
+        
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'status': "updated succesfully"}, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        
+class ListQuestionView(APIView):
+    
     def get(self, request, *args, **kwargs):
-        queryset = Questions.objects.all()
-        serializer = (queryset, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        try:
+            id = request.GET.get('id')
+            if not id:
+                return Response({"error": "ID parameter is missing"}, status=status.HTTP_400_BAD_REQUEST)
+
+            project = Project.objects.get(id=id)
+            queryset = Questions.objects.filter(parent=project)
+            if not queryset.exists():
+                return Response({"error": "No questions found for this QuizSurveyTask"}, status=status.HTTP_404_NOT_FOUND)
+            
+            serializer = ListQuestionSerializer(queryset, many=True) 
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+
+class QuizSurveyResponseView(APIView):
+    
+    def post(self, request, *args, **kwargs):
+        request.data['user'] = request.user.id
+        serializer = QuizSurveyResponseSerializer(data=request.data)
+        
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         

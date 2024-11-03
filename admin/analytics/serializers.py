@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from quizzes.models import MultipleChoice, Questions, Answer
+from quizzes.models import MultipleChoice, Questions, QuizSurveyTaskResponse
 
 
 

@@ -10,8 +10,6 @@ from django.shortcuts import get_object_or_404
 class SurveyAnalyticsView(APIView):
 
     def post(self, request, *args, **kwargs):
-        # project_id = request.GET.get('id')
-        # audience_list = request.GET.getlist('audience')  # Expecting a list of audience IDs
 
         project_id = request.data['id']
         audience_list = request.data['audience']
@@ -20,12 +18,11 @@ class SurveyAnalyticsView(APIView):
             return Response({"error": "Project ID is required"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            project = get_object_or_404(Project, id=project_id)  # Only filter by project ID
+            project = get_object_or_404(Project, id=project_id) 
 
             if project.projectType == 'SRV':
                 questions = project.questions.prefetch_related('choices').all()
 
-                # No need to pass 'questions', only 'audience_list' is needed
                 question_data = QuestionSerializer(questions, many=True, context={'audience_list': audience_list}).data
 
                 return Response({"questions": question_data}, status=status.HTTP_200_OK)

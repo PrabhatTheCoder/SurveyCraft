@@ -5,8 +5,17 @@ import uuid
 class App(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=100)
-    description = models.TextField(blank=True, null=True)
-    industry = models.CharField(max_length=100)
+    URL = models.URLField()
+    app_details = models.TextField()
     isActive = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    createdAt = models.DateTimeField(auto_now_add=True)
+    updatedAt = models.DateTimeField(auto_now=True)
+
+class AppScreen(models.Model):
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=100)
+    App = models.ForeignKey(App, on_delete=models.CASCADE)
+    Image = models.ImageField(upload_to="app_screens/")
+
+    class Meta:
+        unique_together = ("name", "App")
