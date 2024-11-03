@@ -1,9 +1,11 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 import uuid
+from django.contrib.auth.hashers import make_password
+from quizzes.models import Audience
 
 
-
+# *******   [ JWT or OAuth will be use in Future ] ********
 class CustomUserManager(BaseUserManager):
     def create_superuser(self, email, password, **extra_fields):
         if not email:
@@ -28,6 +30,7 @@ class CustomUserManager(BaseUserManager):
         user.save(using=self._db)
         return user
     
+    
 class CustomUser(AbstractUser):
     USER_TYPE_CHOICES = (
         ('OWN', 'Owner'),
@@ -40,12 +43,11 @@ class CustomUser(AbstractUser):
     email = models.EmailField(unique=True)
     user_type = models.CharField(max_length=3, choices=USER_TYPE_CHOICES)
     
-    managed_contestants = models.ManyToManyField('self', limit_choices_to={'user_type': 'CNT'}, blank=True, related_name='managed_by', symmetrical=False)
-    
-    project = models.ManyToManyField("Project", blank=True) 
-
+    role = models.CharField(choices=USER_TYPE_CHOICES, max_length=50)
+    app = models.ManyToManyField('company.App', blank=True, related_name="users")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    is_banned = models.BooleanField(default=False)
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["name"]
@@ -54,22 +56,31 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return self.name
-
+    
+    def is_admin_allowed(self, app):
+        return self.role == "owner" and app in self.app.all()
+    
 
 class AppUsers(models.Model):
-    
-    SOURCE_CHOICES = (
-     ('clevertap', 'CleverTap'),
-     ( 'moengage', 'MoEngage'),
-    )
-    
     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     name = models.CharField(max_length=100, null=True, blank=True)
-    app = models.ForeignKey('appinfo.App', on_delete=models.CASCADE, related_name='appUsers')
-    source = models.CharField(max_length=100, choices=SOURCE_CHOICES, null=True, blank=True)
-    extra_attributes = models.JSONField(default=dict, null=True, blank=True)
+    password = models.CharField(max_length=128, null=False, blank=True)
+    app = models.ForeignKey('company.App', on_delete=models.CASCADE, related_name='+')
+    # audience = models.ForeignKey(Audience, on_delete=models.CASCADE, related_name='appuser')
+    source = models.CharField(max_length=50, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    extra_details = models.JSONField(default=dict, blank=True, null=True)
+
+    def set_password(self, raw_password):
+        related_audiences = self.audience_set.filter(projects__projectType='QUZ')
+        if not related_audiences.exists():
+            return
+        self.password = make_password(raw_password)
+        self.save()
 
     class Meta:
         unique_together = ('id', 'app')
+        
+    def __str__(self):
+        return self.name or 'Anonymous App User'
