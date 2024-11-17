@@ -4,8 +4,9 @@ from django.http import JsonResponse
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
-from .serializers import QuestionSerializer, MultipleChoiceSerializer, ProjectSerializer, ListQuestionSerializer, QuizSurveyResponseSerializer
+from .serializers import QuestionSerializer, MultipleChoiceSerializer, ProjectSerializer, ListQuestionSerializer, QuizSurveyResponseSerializer, DataUploadSerializer, ListAudienceSerializer
 from rest_framework.permissions import IsAuthenticated
+from .utils import ingest_data_task
 
 class ProjectView(APIView):
     
@@ -131,3 +132,40 @@ class QuizSurveyResponseView(APIView):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
+class DataUploadView(APIView):
+    def post(self, request):
+        serializer = DataUploadSerializer(data=request.data)
+        if serializer.is_valid():
+            file = serializer.validated_data['file']
+            audience_id = serializer.validated_data['audience_id']
+            app_id = serializer.validated_data['app_id']
+            file_path = f'/survey/media/{file.name}'
+            with open(file_path, 'wb') as f:
+                for chunk in file.chunks():
+                    f.write(chunk)
+            ingest_data_task.delay(file_path,audience_id,app_id)
+            return Response({"message": "File upload successful, processing started."}, status=status.HTTP_202_ACCEPTED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    
+class ListAudienceView(APIView):
+    
+    permission_classes = [IsAuthenticated] 
+    
+    def get(self, request, *args, **kwargs):
+        user = request.user 
+        audiences = Audience.objects.filter(user=user)
+
+        if not audiences.exists():
+            return Response({"detail": "No audiences found."}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = ListAudienceSerializer(audiences, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+class AudienceView(APIView):
+    
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request, *args, **kwargs):
+        ...

@@ -1,0 +1,70 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: django_survey
+    env_file: .env
+    command: sh entrypoint.sh
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/survey
+      - ./media:/survey/media  # Map host's media folder to container
+
+    depends_on:
+      - db
+      - redis
+    links:
+      - redis
+      - db
+
+  db:
+    image: postgres:15
+    container_name: postgres_survey
+    env_file: .env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:7
+    container_name: redis_survey
+    ports:
+      - "6379:6379"
+
+  celery:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: celery_worker
+    env_file: .env
+    command: celery -A survey worker --loglevel=info
+    volumes:
+      - .:/survey
+      - ./media:/survey/media  # Make sure celery can access the media folder too
+
+    depends_on:
+      - redis
+      - db
+
+  celery-beat:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: celery_beat
+    env_file: .env
+    command: celery -A survey beat --loglevel=info
+    volumes:
+      - .:/survey
+      - ./media:/survey/media  # Ensure celery-beat can access media folder
+
+    depends_on:
+      - redis
+      - db
+
+volumes:
+  postgres_data:

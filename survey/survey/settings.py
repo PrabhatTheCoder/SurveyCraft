@@ -16,7 +16,9 @@ from datetime import timedelta
 import os
 import environ
 env = environ.Env()
-environ.Env.read_env()
+
+# # Read the .env file
+# environ.Env.read_env()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -48,7 +50,7 @@ INSTALLED_APPS = [
     'quizzes', 
     'users',
     'analytics',
-    'company'
+    'company',
 ]
 
 MIDDLEWARE = [
@@ -78,7 +80,7 @@ CORS_ALLOW_HEADERS = [
     'X-CSRFToken',
 ]
 
-ROOT_URLCONF = 'quiz_dashboard.urls'
+ROOT_URLCONF = 'survey.urls'
 
 TEMPLATES = [
     {
@@ -96,16 +98,23 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'quiz_dashboard.wsgi.application'
+WSGI_APPLICATION = 'survey.wsgi.application'
 
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
+
+from urllib.parse import urlparse
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('POSTGRES_DB'),
+        'USER': os.getenv('POSTGRES_USER'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
+        'HOST': os.getenv('POSTGRES_HOST'),
+        'PORT': os.getenv('POSTGRES_PORT'),
     }
 }
 
@@ -184,10 +193,24 @@ Email_ConfigirationEMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
-EMAIL_HOST_USER = env('EMAIL_USER')
-EMAIL_HOST_PASSWORD = env('EMAIL_PASSWORD')
+# EMAIL_HOST_USER = env('EMAIL_USER')
+# EMAIL_HOST_PASSWORD = env('EMAIL_PASSWORD')
 
-CORS_ALLOWED_ORIGINS = [
-    # "http://localhost:3000",
-    # "http://127.0.0.1:3000",
-]
+# CORS_ALLOWED_ORIGINS = [
+#     # "http://localhost:3000",
+#     # "http://127.0.0.1:3000",
+# ]
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+CELERY_BROKER_URL = "redis://redis:6379/0"
+CELERY_RESULT_BACKEND = "redis://redis:6379/0"
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'
+CELERY_ENABLE_UTC = True
+
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True

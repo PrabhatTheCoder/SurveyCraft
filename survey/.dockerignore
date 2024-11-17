@@ -1,0 +1,11 @@
+# Ignore Python bytecode files
+__pycache__
+*.pyc
+*.pyo
+
+# Ignore migration files
+*/migrations/*
+
+# Ignore git files
+.git
+

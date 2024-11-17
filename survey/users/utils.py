@@ -1,9 +1,6 @@
 import os
 from django.core.mail import EmailMessage
 from django.core.exceptions import ValidationError
-import environ
-env = environ.Env()
-environ.Env.read_env()
 
 class Util:
     

@@ -1,6 +1,6 @@
 from django.urls import path
-from .views import SurveyAnalyticsView
+# from .views import SurveyAnalyticsView
 
-urlpatterns = [
-    path('survey-analytics/', SurveyAnalyticsView.as_view()),
-]
+# urlpatterns = [
+#     path('survey-analytics/', SurveyAnalyticsView.as_view()),
+# ]

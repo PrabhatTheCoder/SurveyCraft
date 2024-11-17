@@ -1,15 +1,15 @@
 from rest_framework import serializers
-from .models import Questions, MultipleChoice, Project, QuizSurveyTaskResponse
+from .models import Questions, MultipleChoice, Project, QuizSurveyTaskResponse, Audience
 from datetime import timedelta
 
 
 class ProjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
-        fields = ['name','screen','status','projectType','audience','app','expiry_date']
+        fields = ['id','name','screen','status','projectType','audience','app','expiry_date']
         
         extra_kwargs = {
-            'expiry_date': {'required': False}, 
+            'expiry_date': {'required': False},
         }
         
     def create(self, validated_data):
@@ -121,3 +121,18 @@ class ListAllQuestionSerializer(serializers.ModelSerializer):   # Question in Ap
         multiples = ListMultipleChoiceSerializer(queryset, many=True)
         return multiples.data  
         
+
+class DataUploadSerializer(serializers.Serializer):
+    file = serializers.FileField()
+    audience_id = serializers.UUIDField()
+    app_id = serializers.UUIDField()
+
+    def validate_file(self, file):
+        if not file.name.endswith(('.xls', '.xlsx')):
+            raise serializers.ValidationError("Only Excel files are allowed.")
+        return file
+    
+class ListAudienceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Audience
+        fields = ['id','name','createdAt','updatedAt']

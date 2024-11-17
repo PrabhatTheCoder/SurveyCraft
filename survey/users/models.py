@@ -61,19 +61,20 @@ class CustomUser(AbstractUser):
         return self.role == "owner" and app in self.app.all()
     
 
+# When Client Upload the excel sheet or fetch AppUser from Webhook - He has to first Give the Audience
 class AppUsers(models.Model):
     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     name = models.CharField(max_length=100, null=True, blank=True)
     password = models.CharField(max_length=128, null=False, blank=True)
     app = models.ForeignKey('company.App', on_delete=models.CASCADE, related_name='+')
-    # audience = models.ForeignKey(Audience, on_delete=models.CASCADE, related_name='appuser')
-    source = models.CharField(max_length=50, blank=True, null=True)
+    audience = models.ForeignKey('quizzes.Audience', on_delete=models.CASCADE, related_name='appuser')
+    source = models.CharField(max_length=50, default='self')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     extra_details = models.JSONField(default=dict, blank=True, null=True)
 
     def set_password(self, raw_password):
-        related_audiences = self.audience_set.filter(projects__projectType='QUZ')
+        related_audiences = self.audience_set.filter(projects__competitions=True)
         if not related_audiences.exists():
             return
         self.password = make_password(raw_password)

@@ -5,6 +5,7 @@ from django.core.exceptions import ValidationError
 class Audience(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=100)
+    user = models.ForeignKey('users.CustomUser',on_delete=models.CASCADE)
     createdAt = models.DateTimeField(auto_now_add=True)
     updatedAt = models.DateTimeField(auto_now=True)
 
@@ -35,7 +36,7 @@ class Project(models.Model):
     
     app = models.ForeignKey('company.App',models.CASCADE,related_name='project_app')
     isAll = models.BooleanField(default=False)
-    
+    competitions = models.BooleanField(default=False)
     
     createdAt = models.DateTimeField(auto_now_add=True)
     expiry_date = models.DateTimeField(null=True, blank=True)

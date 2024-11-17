@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import ProjectView, ListProjectView, QuestionView, MultipleChoiceView, ListQuestionView, QuizSurveyResponseView
+from .views import ProjectView, ListProjectView, QuestionView, MultipleChoiceView, ListQuestionView, QuizSurveyResponseView, DataUploadView, ListAudienceView
 
 app_name = 'quizzes'
 
@@ -19,6 +19,8 @@ urlpatterns = [
     path('create-multiple/',MultipleChoiceView.as_view()),
     path('update-multiple/<uuid:id>/',MultipleChoiceView.as_view()),
     
+    path('upload-file/', DataUploadView.as_view()),
+    path('list-audience/', ListAudienceView.as_view())
     
     
 ]

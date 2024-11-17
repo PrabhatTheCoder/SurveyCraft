@@ -11,8 +11,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('quizzes/', include('quizzes.urls')),
     path('api/v1/survey/',include('quizzes.urls')),
-    path('api/v1/analytics/', include('analytics.urls')),
+    # path('api/v1/analytics/', include('analytics.urls')),
     path('api/v1/users/', include('users.urls')),
+    path('api/v1/company/', include('company.urls')),
     
     
     path("api/v1/auth/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
