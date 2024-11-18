@@ -1,4 +1,7 @@
 Creating & Updating Audience API
+AppUser password(JWT Authentication) + Email
+Send Email Password after creating AppUser(competition == True) 
 setup Django Websocket or channels
 writing code for Student who will use for Quiz Competion (Web Socket)
 Integration of webhooks
+Analytics Section 
