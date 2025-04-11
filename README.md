@@ -1,4 +1,4 @@
-## Quiz and Survey Backend (DRF)
+## SurveyCraft Backend (DRF)
 
 Developing a robust backend using Django REST Framework for a Quiz and Survey platform inspired by Pollfish. The platform enables colleges to organize quiz competitions, manage participants, and track results. Teachers can create and analyze quizzes for academic purposes, gaining insights into student performance through detailed reporting and analytics.
 
